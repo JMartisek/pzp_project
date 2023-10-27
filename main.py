@@ -1,60 +1,56 @@
-import matplotlib
+import matplotlib.pyplot as plt
+import CPU_one_thread
+import time
 
 
-def parseWords(array):
-    return array.split()
+#graphic functions
+def pieChart(labels, size):
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+    plt.show()
 
-def checkLen(word):
-    if(len(word) == 0):
-        return False
-    return True
-def weirdStringParser(list, word, index):
-    partioned = word.partition("--")
-    list[index] = partioned[0]
-    list.insert(index+1,partioned[2])
-    return list
 
-def arrayCount(stopWords, data):
-    counter = 0
-    for i in data:
-        if i in stopWords:
-            counter +=1
-    return counter
 
+
+# data load
 data = open("data.txt", "r")
 data = data.read()
 stopData = open("stop_words.txt", "r")
-stopData = stopData.read()
-
-mujList = parseWords(data)
+stopData = stopData.read().split()
 
 
+# cpu one thread version
+start = time.time()
+mujList = CPU_one_thread.parseWords(data)
+data = CPU_one_thread.filterSize(mujList)
+stop = time.time()
+labels = ['lower then 5', 'others', 'bigger then 7']
+sizes = [data[0], data[1], data[2]]
 
 
 
-#mujList = ["pepa.", "pepa--jede", "pepa,", "pepa\"", "pepa-", "pepa:"]
-repeat = True
-susWords = []
-lastWordList = [",", ")", ".", "\"", "-", ":", ";", "!", "?"]
-firstWordList = ["\"", "-", "("]
-for index, a in enumerate(mujList):
-    repeat = True
 
-    while (repeat == True):
-        repeat = False
-        if checkLen(a) > 0:
-            if a[len(a) - 1] in lastWordList:#== "," or a[0] == ")" or a[len(a) - 1] == "." or a[len(a) - 1] == "\"" or a[len(a) - 1] == "-" or a[len(a) - 1] == ":" or a[len(a) - 1] == ";" or a[len(a) - 1] == "!"or a[len(a) - 1] == "?":
-                a = a[0:len(a) - 1]
-                mujList[index] = a
-                repeat = checkLen(a)
+print("------------------ CPU ONE THREAD ------------------")
+print("Number of stopWords: ", CPU_one_thread.stopWordsCount(stopData, mujList))
+print("Filtered by stopwords( index: 'stop word'):", CPU_one_thread.stopWordsFilter(stopData, mujList))
+print("There is ", data[0], "words with 4 or less characters")
+print("There is ", data[1], "words with 5 - 7 characters")
+print("There is ", data[2], "words with 8 or more characters")
+print(data[0]+data[1]+data[2], " <- this should be equal to this -> ", len(mujList))
+print("It takes ", stop-start, "seconds.")
+pieChart(labels, sizes)
 
-            elif a[0] in firstWordList:#== "\"" or a[0] == "-" or a[0] == "(":
-                a = a[1:]
-                mujList[index] = a
-                repeat = checkLen(a)
-            if "--" in a:
-                mujList = weirdStringParser(mujList,a, index)
-    #print(a)
-#print(mujList)
 
-print("Number of arrays: ", arrayCount(stopData, mujList))
+
+# cpu multithread version
+
+# gpu version
+
+
+# spark version
+
+
+
+
+
+input('Press ENTER to exit')
