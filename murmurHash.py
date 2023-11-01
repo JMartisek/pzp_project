@@ -1,4 +1,8 @@
 def bytes_to_long(bytes):
+    length = len(bytes)
+    if length < 8:
+        extra = 8 - length
+        bytes = b'\000' * extra + bytes
     assert len(bytes) == 8
     return sum((b << (k * 8) for k, b in enumerate(bytes)))
 
@@ -10,11 +14,11 @@ def murmur64(data, seed = 19820125):
 
     MASK = 2 ** 64 - 1
 
-    data_as_bytes = bytearray(data)
+    data_as_bytes = bytearray(data, encoding='utf-8')
 
     h = seed ^ ((m * len(data_as_bytes)) & MASK)
 
-    off = len(data_as_bytes)/8*8
+    off = int(len(data_as_bytes)/8)*8
     for ll in range(0, off, 8):
         k = bytes_to_long(data_as_bytes[ll:ll + 8])
         k = (k * m) & MASK

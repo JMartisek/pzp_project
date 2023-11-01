@@ -1,3 +1,6 @@
+import murmurHash
+import bogosort
+
 def parseWords(array):
     return cleanWords(array.split())
 
@@ -62,3 +65,40 @@ def stopWordsFilter(stopWords, dataSet):
         if word in stopWords:
             stopWordsDict[index] = word
     return stopWordsDict
+
+
+def hash(data):
+    MyTextDictionary = {}
+    for i in data:
+        MyTextDictionary[murmurHash.murmur64(i)] = len(i)
+    return MyTextDictionary
+
+def singleHash(word):
+    return murmurHash.murmur64(word)
+
+def testHash(data):
+    myTestDictionary = {}
+    for i in data:
+        myTestDictionary[i] = len(i)
+    return myTestDictionary
+
+def wordsFrequency(data):
+    frequencyDic = {}
+    for i in data:
+        if i in frequencyDic:
+            frequencyDic[i] = frequencyDic.get(i) +1
+        else:
+            frequencyDic[i] = 1
+    #bogosort.bogoPogoSort(frequencyDic.values())
+    return frequencyDic
+
+def getValueByKey(data, key):
+    val = list(data.keys())[list(data.values()).index(key)]
+    return val
+
+
+
+
+
+
+
