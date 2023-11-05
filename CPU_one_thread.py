@@ -89,7 +89,8 @@ def wordsFrequency(data):
             frequencyDic[i] = frequencyDic.get(i) +1
         else:
             frequencyDic[i] = 1
-    #bogosort.bogoPogoSort(frequencyDic.values())
+    #bogosort.bogoPogoSort(list(frequencyDic.values()))
+    #frequencyDic = sorted(list(frequencyDic.values()), reverse=True)
     return frequencyDic
 
 def getValueByKey(data, key):
