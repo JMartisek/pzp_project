@@ -47,16 +47,16 @@ def cleanWords(array):
     return array
 
 def filterSize(dataSet):
-    lower = 0
-    middle = 0
-    greater = 0
+    lower = []
+    middle = []
+    greater = []
     for word in dataSet:
         if len(word) > 7:
-            greater += 1
+            greater.append(word)
         elif len(word) < 5:
-            lower += 1
+            lower.append(word)
         else:
-            middle += 1
+            middle.append(word)
     return [lower, middle, greater]
 
 def stopWordsFilter(stopWords, dataSet):

@@ -2,8 +2,11 @@ import threading
 import math
 import time
 import bogosort
+from pycuda import driver, compiler, gpuarray, tools
 # mam prej 16 threadu
 NumberOfThreads = 16
+
+
 
 def threadParameters(Data):
 
@@ -42,7 +45,7 @@ def MFilterSize(data):
 def bogoPogoPopogo(Dataset,results,i):
     results[i] = bogosort.bogoPogoSort(Dataset)
 
-    print("thread",i, "is done")
+   # print("thread",i, "is done")
 
 def FilterSize(dataSet, results, i):
     lower = 0
@@ -61,7 +64,7 @@ def FilterSize(dataSet, results, i):
     results[1] += middle
     results[2] += greater
     lck.release()
-    print("thread",i, "is done")
+    #print("thread",i, "is done")
 
 
 

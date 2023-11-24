@@ -29,7 +29,8 @@ mujList = CPU_one_thread.parseWords(data)
 hashed_data = CPU_one_thread.hash(mujList)
 tested_data = CPU_one_thread.testHash(mujList)
 start = time.time()
-data = CPU_one_thread.filterSize(mujList)
+data = CPU_one_thread.filterSize(mujList)  # filtered by size
+StopWordsFiltered = list(CPU_one_thread.stopWordsFilter(stopData, mujList).values())  # stop words filtered
 stop = time.time()
 labels = ['lower then 5', 'others', 'bigger then 7']
 sizes = [data[0], data[1], data[2]]
@@ -42,8 +43,11 @@ testData[11] = 1
 testData[33] = 3
 testData[44] = 4
 
-freqWrods = CPU_one_thread.wordsFrequency(mujList) #return dict
-bogosorted = sorted(list(freqWrods.values()), reverse= True)
+freqWrodsStop = CPU_one_thread.wordsFrequency(StopWordsFiltered) #return dict
+bogosortedStop = sorted(list(freqWrodsStop.values()), reverse= True)
+
+freqWrodsSize = CPU_one_thread.wordsFrequency(data[1]) #return dict
+bogosortedSize = sorted(list(freqWrodsSize.values()), reverse= True)
 
 
 print("------------------ CPU ONE THREAD ------------------")
@@ -56,8 +60,9 @@ print(data[0]+data[1]+data[2], " <- this should be equal to this -> ", len(mujLi
 print("It takes ", stop-start, "seconds.")
 print("Number of elements in hashed dictionary:", len(hashed_data))
 print("Number of elements in normal dictionary:", len(tested_data))
-print("Most frequent word is", CPU_one_thread.getValueByKey(freqWrods,bogosorted[0]), "and we have it there", bogosorted[0], "times." )
-print("Most used word is \"",CPU_one_thread.getValueByKey(freqWrods, bogosorted[0]), "\"we count ", bogosorted[0])
+print("Most frequent word in Size filtered is", CPU_one_thread.getValueByKey(freqWrodsStop,bogosortedStop[0]), "and we have it there", bogosortedStop[0], "times." )
+print("Most frequent word in stop words filtered is", CPU_one_thread.getValueByKey(freqWrodsSize,bogosortedSize[0]), "and we have it there", bogosortedSize[0], "times." )
+#print("Most used word is \"",CPU_one_thread.getValueByKey(freqWrods, bogosorted[0]), "\"we count ", bogosorted[0])
 #pieChart(labels, sizes)
 
 # cpu multithread version
@@ -68,6 +73,13 @@ testData2 = [2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2
 
 CPU_multithread.MFilterSize(mujList)
 
+class bcolors:
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    ENDC = '\033[0m'
+
+print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolors.ENDC)
 
 # gpu version
 
