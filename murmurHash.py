@@ -56,3 +56,15 @@ def murmur64(data, seed = 19820125):
     h = h ^ ((h >> r) & MASK)
 
     return h
+
+def createHashLenght(data):
+    MyTextDictionary = {}
+    for i in data:
+        MyTextDictionary[murmur64(i)] = len(i)
+    return MyTextDictionary
+
+def createHashWord(data):
+    MyTextDictionary = {}
+    for i in data:
+        MyTextDictionary[murmur64(i)] = i
+    return MyTextDictionary

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
-import CPU_one_thread
+from CPU_one_thread import OneThreadCPU
+import murmurHash
 import CPU_multithread
 import time
 import threading
@@ -10,7 +11,7 @@ import psutil
 #graphic functions
 def pieChart(labels, size):
     fig, ax = plt.subplots()
-    ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+    ax.pie(size, labels=labels, autopct='%1.1f%%')
     plt.show()
 
 
@@ -22,9 +23,25 @@ data = data.read()
 stopData = open("stop_words.txt", "r")
 stopData = stopData.read().split()
 
+#parse data
+
+parsedData = OneThreadCPU.parseWords(data)
+
+#hash data
+
+Hash_lenght_dict = murmurHash.createHashLenght(parsedData)
+Hash_word_dict = murmurHash.createHashWord(parsedData)
+
 
 # cpu one thread version
 
+cpuVersion1 = OneThreadCPU(True,parsedData)
+
+print("We have ",len(cpuVersion1.middleValue), "filtered words.")
+
+
+
+"""
 mujList = CPU_one_thread.parseWords(data)
 hashed_data = CPU_one_thread.hash(mujList)
 tested_data = CPU_one_thread.testHash(mujList)
@@ -43,6 +60,8 @@ testData[11] = 1
 testData[33] = 3
 testData[44] = 4
 
+
+
 freqWrodsStop = CPU_one_thread.wordsFrequency(StopWordsFiltered) #return dict
 bogosortedStop = sorted(list(freqWrodsStop.values()), reverse= True)
 
@@ -56,13 +75,12 @@ print("Filtered by stopwords( index: 'stop word'):", CPU_one_thread.stopWordsFil
 print("There is ", data[0], "words with 4 or less characters")
 print("There is ", data[1], "words with 5 - 7 characters")
 print("There is ", data[2], "words with 8 or more characters")
-print(data[0]+data[1]+data[2], " <- this should be equal to this -> ", len(mujList))
+#print(data[0]+data[1]+data[2], " <- this should be equal to this -> ", len(mujList))  ROZBITE
 print("It takes ", stop-start, "seconds.")
 print("Number of elements in hashed dictionary:", len(hashed_data))
 print("Number of elements in normal dictionary:", len(tested_data))
 print("Most frequent word in Size filtered is", CPU_one_thread.getValueByKey(freqWrodsStop,bogosortedStop[0]), "and we have it there", bogosortedStop[0], "times." )
 print("Most frequent word in stop words filtered is", CPU_one_thread.getValueByKey(freqWrodsSize,bogosortedSize[0]), "and we have it there", bogosortedSize[0], "times." )
-#print("Most used word is \"",CPU_one_thread.getValueByKey(freqWrods, bogosorted[0]), "\"we count ", bogosorted[0])
 #pieChart(labels, sizes)
 
 # cpu multithread version
@@ -80,7 +98,7 @@ class bcolors:
     ENDC = '\033[0m'
 
 print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolors.ENDC)
-
+"""
 # gpu version
 
 
