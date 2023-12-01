@@ -18,14 +18,18 @@ def stopWordsCounter(Data):
 
 def MFilterSize(data):
     NumberOfItemOnOneThread = threadParameters(data)
-    DataSets = []
-    Dataset = []
     threads = []
     iterator = 0
-    results = [0,0,0]
+    lower = []
+    middle = []
+    higher = []
+    result = [lower, middle, higher]
+    results = [[],[],[]]
+    lck = threading.Lock()
+
     for i in range(NumberOfThreads):
         Dataset = data[i*NumberOfItemOnOneThread:(1+i)*NumberOfItemOnOneThread]
-        t = threading.Thread(target=FilterSize, args=(Dataset,results,i,))
+        t = threading.Thread(target=FilterSize, args=(Dataset,results,i,lck))
         threads.append(t)
         iterator += 1
 
@@ -35,11 +39,16 @@ def MFilterSize(data):
 
     for i in range(NumberOfThreads):
         threads[i].join()
+    size = len(results)
+    for i in range(len(results)):
+        for j in results[i]:
+            result[i] += j
 
     stop = time.time()
     print("multi:", stop - start)
-    print(results)
+    print("Number of \" middle\" elements:", len(result[1]))
     print("everything is done")
+    return result
 
 
 def bogoPogoPopogo(Dataset,results,i):
@@ -47,24 +56,59 @@ def bogoPogoPopogo(Dataset,results,i):
 
    # print("thread",i, "is done")
 
-def FilterSize(dataSet, results, i):
-    lower = 0
-    middle = 0
-    greater = 0
-    lck = threading.Lock()
+def FilterSize(dataSet, results, i,lck):
+    lower = []
+    middle = []
+    greater = []
+
     for word in dataSet:
         if len(word) > 7:
-            greater += 1
+            greater.append(word)
         elif len(word) < 5:
-            lower += 1
+            lower.append(word)
         else:
-            middle += 1
+            middle.append(word)
     lck.acquire()
-    results[0] += lower
-    results[1] += middle
-    results[2] += greater
+    results[0].append(lower)
+    results[1].append(middle)
+    results[2].append(greater)
     lck.release()
     #print("thread",i, "is done")
 
+def filterStopWords(data, stopWords):
+    NumberOfItemOnOneThread = threadParameters(data)
+    threads = []
+    results = {}
+    lck = threading.Lock()
+    for i in range(NumberOfThreads):
+        Dataset = data[i*NumberOfItemOnOneThread:(1+i)*NumberOfItemOnOneThread]
+        t = threading.Thread(target=filterStopWord, args=(Dataset,stopWords,results,len(Dataset)*i,lck))
+        threads.append(t)
 
+    start = time.time()
+    for i in range(NumberOfThreads):
+        threads[i].start()
 
+    for i in range(NumberOfThreads):
+        threads[i].join()
+    stop = time.time()
+    print("stopWords:", stop - start)
+    return wordsFrequency(results.values())
+
+def filterStopWord(data, stopWords, results, AdIndex,lck):
+    for index, word in enumerate(data):
+        if word in stopWords:
+            actualIndex =index+ AdIndex
+            lck.acquire()
+            results[actualIndex] = word
+            lck.release()
+
+def wordsFrequency(data):
+    frequencyDic = {}
+    for i in data:
+        if i in frequencyDic:
+            frequencyDic[i] = frequencyDic.get(i) +1
+        else:
+            frequencyDic[i] = 1
+    # bogosort.bogoPogoSort(list(frequencyDic.values()))
+    return sorted(frequencyDic.items(), key=lambda x: x[1], reverse=True)

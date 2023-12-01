@@ -1,22 +1,29 @@
-import murmurHash
-import bogosort
-
-
-
 
 class OneThreadCPU:
+    data = []
     lessThen4 = []
     middleValue = []
     greaterThen8 = []
     stopWords = []
     MostFrequentWord = []
+    indexStopWordsDict = {}
+    countStopWordDict = {}
+    countSizeWordDict = {}
+
     __privateVariable = 0
 
-
-    def __init__(self, hashed, data ):
+    def __init__(self, hashed, data, stopWords):
         print("CPU one thread is starting ...")
-        if hashed == True:
-            OneThreadCPU.__filterSizeWord(data)
+        self.data = data
+        self.stopWords = stopWords
+        if not hashed:
+            OneThreadCPU.__filterSizeWord(self)
+            OneThreadCPU.__stopWordsFilter(self)
+            self.countStopWordDict = OneThreadCPU.__wordsFrequency(self, self.indexStopWordsDict.values())
+            OneThreadCPU.__getTwoItemsFromDict(self,self.countStopWordDict, "stop word")
+            self.countSizeWordDict = OneThreadCPU.__wordsFrequency(self, self.middleValue)
+            OneThreadCPU.__getTwoItemsFromDict(self,self.countSizeWordDict, "word size")
+
         else:
             print("Not ready yet..")
         # vsechny vystupy jako instance classy, tedy: 3 pole a v kazdem rozdeleni do delky slov
@@ -25,23 +32,20 @@ class OneThreadCPU:
     def parseWords(array):
         return OneThreadCPU.__cleanWords(array.split())
 
+    @staticmethod
     def __checkLen(word):
         if(len(word) == 0):
             return False
         return True
+
+    @staticmethod
     def __weirdStringParser(list, word, index):
         partioned = word.partition("--")
         list[index] = partioned[0]
         list.insert(index+1,partioned[2])
         return list
 
-    def __stopWordsCount(stopWords, data):
-        counter = 0
-        for i in data:
-            if i in stopWords:
-                counter +=1
-        return counter
-
+    @staticmethod
     def __cleanWords(array):
         repeat = True
         susWords = []
@@ -67,35 +71,41 @@ class OneThreadCPU:
                         array = OneThreadCPU.__weirdStringParser(array, a, index)
         return array
 
-    def __filterSizeWord(dataSet):
-        for word in dataSet:
+    @staticmethod
+    def __filterSizeWord(self):
+        for word in self.data:
             if len(word) > 7:
                 OneThreadCPU.greaterThen8.append(word)
             elif len(word) < 5:
                 OneThreadCPU.lessThen4.append(word)
             else:
                 OneThreadCPU.middleValue.append(word)
+        print("Number of elements after word lenght filtration: ",len(self.middleValue))
 
-    def __stopWordsFilter(stopWords, dataSet):
-        stopWordsDict = {}
-        for index, word in enumerate(dataSet):
-            if word in stopWords:
-                stopWordsDict[index] = word
-        return stopWordsDict
+    @staticmethod
+    def __stopWordsFilter(self):
+        for index, word in enumerate(self.data):
+            if word in self.stopWords:
+                self.indexStopWordsDict[index] = word
+        print("Number of elements after stop word filtration: ", len(self.indexStopWordsDict.values()))
 
-
-    def __wordsFrequency(data):
+    @staticmethod
+    def __wordsFrequency(self, data):
         frequencyDic = {}
         for i in data:
             if i in frequencyDic:
                 frequencyDic[i] = frequencyDic.get(i) +1
             else:
                 frequencyDic[i] = 1
-        #bogosort.bogoPogoSort(list(frequencyDic.values()))
-        #frequencyDic = sorted(list(frequencyDic.values()), reverse=True)
-        return frequencyDic
+        # bogosort.bogoPogoSort(list(frequencyDic.values()))
+        return sorted(frequencyDic.items(), key=lambda x: x[1], reverse=True)
 
-    def __getValueByKey(data, key):
+    def __getTwoItemsFromDict(self, dict, type):
+        print("First",type," value", dict[0],  "and second", dict[1])
+
+
+    @staticmethod
+    def __getValueByKey(self, data, key):
         val = list(data.keys())[list(data.values()).index(key)]
         return val
 
