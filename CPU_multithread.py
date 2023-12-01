@@ -48,6 +48,9 @@ def MFilterSize(data):
     print("multi:", stop - start)
     print("Number of \" middle\" elements:", len(result[1]))
     print("everything is done")
+
+    sortedResult = wordsFrequency(result[1])
+    __getTwoItemsFromDict(sortedResult, "size words")
     return result
 
 
@@ -93,7 +96,9 @@ def filterStopWords(data, stopWords):
         threads[i].join()
     stop = time.time()
     print("stopWords:", stop - start)
-    return wordsFrequency(results.values())
+    sortedResult = wordsFrequency(results.values())
+    __getTwoItemsFromDict(sortedResult, "stop words")
+    return sortedResult
 
 def filterStopWord(data, stopWords, results, AdIndex,lck):
     for index, word in enumerate(data):
@@ -112,3 +117,6 @@ def wordsFrequency(data):
             frequencyDic[i] = 1
     # bogosort.bogoPogoSort(list(frequencyDic.values()))
     return sorted(frequencyDic.items(), key=lambda x: x[1], reverse=True)
+
+def __getTwoItemsFromDict(dict, type):
+    print("First",type," value", dict[0],  "and second", dict[1])
