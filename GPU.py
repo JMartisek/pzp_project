@@ -7,43 +7,16 @@ import time
 import math
 
 #2560 cuda cores
-def GPU_setup(data, stopWords):
-    cuda.init()
-    dev = cuda.Device(0)
-    ctx =dev.make_context()
-    block_size =256
-    numOfElements = len(data)
-    gridDim =int(numOfElements/block_size+1)
-    data = numpy.array(data)
-    stopWords = numpy.array(stopWords)
-    mod =SourceModule("""
-    __global__ void StopWords(const int *inputArray, const int arraySize,const int *stopWords, const int NumberOfStopWords, int *output, const int N, )
-    {
-        __shared__ int values[1];
-        unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if(idx < N){
-            __syncthreads()
-        for(
-       
-        }
-  
-    }
-
-""")
-    filterStopWords = mod.get_function("testFunction")
-    data_gpu = cuda.mem_alloc(data.nbytes)
-    stopWords_gpu = cuda.mem_alloc(stopWords.nbytes)
-    output = numpy.empty_like(data)
 
 
 def filterStopWords(stopWords,data ):
 
-    nData = numpy.array(data, dtype=numpy.int)
-    nStopWords = numpy.array(stopWords, dtype=numpy.int128)
+    nData = numpy.array(data, dtype=numpy.uint64)
+    nStopWords = numpy.array(stopWords, dtype=numpy.uint64)
     sizeOfArray = nData.size
     word_array = numpy.zeros(len(nStopWords), dtype=numpy.bool_)
-    word_index = numpy.zeros(len(nStopWords) * sizeOfArray, dtype=numpy.int128)
-    word_count = numpy.zeros(len(nStopWords), dtype=numpy.int128)
+    word_index = numpy.zeros(len(nStopWords) * sizeOfArray, dtype=numpy.uint64)
+    word_count = numpy.zeros(len(nStopWords), dtype=numpy.uint64)
 
     BLOCK_SIZE = 256
     GRID_SIZE= (sizeOfArray + BLOCK_SIZE - 1) // BLOCK_SIZE

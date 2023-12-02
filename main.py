@@ -27,7 +27,7 @@ parsedData = OneThreadCPU.parseWords(data)
 #hash data
 Hash_lenght_dict = murmurHash.createHashLenght(parsedData)
 Hash_word_dict = murmurHash.createHashWord(parsedData)
-
+hashed_data = murmurHash.hashedArray(parsedData)
 hash_stop_dict = murmurHash.createHashWord(stopData)
 
 # cpu one thread version
@@ -59,7 +59,7 @@ print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolor
 
 # gpu version
 
-GPU.filterStopWords(list(hash_stop_dict.keys()),list(Hash_word_dict.keys()))
+GPU.filterStopWords(hashed_data,list(Hash_word_dict.keys()))
 # spark version
 
 
