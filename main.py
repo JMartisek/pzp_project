@@ -3,6 +3,7 @@ from CPU_one_thread import OneThreadCPU
 import murmurHash
 import CPU_multithread
 import time
+import GPU
 import threading
 import bogosort
 import psutil
@@ -58,7 +59,7 @@ print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolor
 
 # gpu version
 
-
+GPU.filterStopWords(list(hash_stop_dict.keys()),list(Hash_word_dict.keys()))
 # spark version
 
 
