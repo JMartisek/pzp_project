@@ -59,16 +59,45 @@ def filterSizeWords(data_keys, data_values,hashDic, min_length, max_length):
     print("Number of filtered words:", len(complete))
     print(output[:sizeOfArray])
 
-# Příklad použití
-"""
-random_numbers = np.random.randint(0, 10, size=100)
-data = open("data.txt", "r")
-data = data.read()
-parsedData = OneThreadCPU.parseWords(data)
-Hash_lenght_dict = murmurHash.createHashLenght(parsedData)
-Hash_word_dict = murmurHash.createHashWord(parsedData)
-hashed = list(Hash_lenght_dict.keys())
-length = list(Hash_lenght_dict.values())
-print(random_numbers)
-filterSizeWords(hashed, length, 5, 7)
-"""
+def filterStopWords(data, stopWords):
+    large_array = np.array(data, dtype=np.uint64)
+    small_array = np.array(stopWords, dtype=np.uint64)
+
+    # Vytvoření pole pro výsledky
+    result_array = np.zeros_like(large_array, dtype=np.bool_)
+
+    # Převod na GPU
+    large_array_gpu = cuda.to_device(large_array)
+    small_array_gpu = cuda.to_device(small_array)
+    result_array_gpu = cuda.to_device(result_array)
+
+    # Spuštění jádra
+    BLOCK_SIZE = 256
+    GRID_SIZE = (large_array.size + BLOCK_SIZE - 1) // BLOCK_SIZE
+    kernel_code = """
+    __global__ void search_and_update_kernel(const int *large_array, int large_size, const int *small_array, int small_size, bool *result_array) {
+        int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+        if (tid < large_size) {
+            int current_value = large_array[tid];
+
+
+            for (int i = 0; i < small_size; ++i) {
+                if (current_value == small_array[i]) {
+                    result_array[tid] = true;
+                    break;  
+                }
+            }
+        }
+    }
+    """
+    mod = SourceModule(kernel_code)
+    search_and_update_kernel = mod.get_function("search_and_update_kernel")
+    search_and_update_kernel(large_array_gpu, np.int32(large_array.size), small_array_gpu, np.int32(small_array.size),
+                             result_array_gpu, block=(BLOCK_SIZE, 1, 1), grid=(GRID_SIZE, 1, 1))
+
+    # Převod zpět na CPU
+    cuda.memcpy_dtoh(result_array, result_array_gpu)
+
+    # Výpis výsledků
+    print(result_array)
