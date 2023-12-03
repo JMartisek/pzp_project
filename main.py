@@ -39,7 +39,7 @@ start = time.time()
 cpuVersion1 = OneThreadCPU(False, parsedData, stopData)
 stop = time.time()
 
-print("CPU single thread without hash take ", stop-start, "seconds")
+print("CPU single thread takes", stop-start, "seconds")
 
 # cpu multi thread version
 

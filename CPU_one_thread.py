@@ -15,16 +15,17 @@ class OneThreadCPU:
     __privateVariable = 0
 
     def __init__(self, hashed, data, stopWords):
-        print("CPU one thread is starting ...")
+        #print("CPU one thread is starting ...")
         self.data = data
         self.stopWords = stopWords
         if not hashed:
             OneThreadCPU.__filterSizeWord(self)
+            self.countSizeWordDict = OneThreadCPU.__wordsFrequency(self, self.middleValue)
+            OneThreadCPU.__getTwoItemsFromDict(self,self.countSizeWordDict, "filter size")
             OneThreadCPU.__stopWordsFilter(self)
             self.countStopWordDict = OneThreadCPU.__wordsFrequency(self, self.indexStopWordsDict.values())
             OneThreadCPU.__getTwoItemsFromDict(self,self.countStopWordDict, "stop word")
-            self.countSizeWordDict = OneThreadCPU.__wordsFrequency(self, self.middleValue)
-            OneThreadCPU.__getTwoItemsFromDict(self,self.countSizeWordDict, "word size")
+
 
         else:
             print("Not ready yet..")
@@ -84,14 +85,17 @@ class OneThreadCPU:
             else:
                 OneThreadCPU.middleValue.append(word)
         stop = time.time()
-        print("CPU single thread filter size", stop - start, "Seconds")
-        print("Number of elements after word lenght filtration: ",len(self.middleValue))
+        print("CPU single thread filter size takes", stop - start, "seconds")
+        print("Number of elements after filter size: ",len(self.middleValue))
 
     @staticmethod
     def __stopWordsFilter(self):
+        start = time.time()
         for index, word in enumerate(self.data):
             if word in self.stopWords:
                 self.indexStopWordsDict[index] = word
+        stop = time.time()
+        print("CPU single thread stopWords filter takes", stop - start, "seconds")
         print("Number of elements after stop word filtration: ", len(self.indexStopWordsDict.values()))
 
     @staticmethod
