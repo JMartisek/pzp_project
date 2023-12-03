@@ -25,10 +25,12 @@ stopData = stopData.read().split()
 parsedData = OneThreadCPU.parseWords(data)
 
 #hash data
-Hash_lenght_dict = murmurHash.createHashLenght(parsedData)
+Hash_length_dict = murmurHash.createHashLenght(parsedData)
 Hash_word_dict = murmurHash.createHashWord(parsedData)
 hashed_data = murmurHash.hashedArray(parsedData)
 hash_stop_dict = murmurHash.createHashWord(stopData)
+
+hashed_parsedData, parsedDataLenght = murmurHash.hashArray(parsedData)
 
 # cpu one thread version
 print("------------------ CPU ONE THREAD ------------------")
@@ -58,8 +60,8 @@ class bcolors:
 print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolors.ENDC)
 
 # gpu version
-
-GPU.filterStopWords(hashed_data,list(Hash_word_dict.keys()))
+print("------------------ GPU MULTI THREAD ------------------")
+GPU.filterSizeWords(hashed_parsedData,parsedDataLenght,Hash_word_dict, 4,8)
 # spark version
 
 

@@ -1,3 +1,5 @@
+import time
+
 
 class OneThreadCPU:
     data = []
@@ -73,6 +75,7 @@ class OneThreadCPU:
 
     @staticmethod
     def __filterSizeWord(self):
+        start = time.time()
         for word in self.data:
             if len(word) > 7:
                 OneThreadCPU.greaterThen8.append(word)
@@ -80,6 +83,8 @@ class OneThreadCPU:
                 OneThreadCPU.lessThen4.append(word)
             else:
                 OneThreadCPU.middleValue.append(word)
+        stop = time.time()
+        print("CPU single thread filter size", stop - start, "Seconds")
         print("Number of elements after word lenght filtration: ",len(self.middleValue))
 
     @staticmethod

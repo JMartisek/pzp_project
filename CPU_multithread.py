@@ -45,7 +45,7 @@ def MFilterSize(data):
             result[i] += j
 
     stop = time.time()
-    print("multi:", stop - start)
+    print("CPU multithread:", stop - start)
     print("Number of \" middle\" elements:", len(result[1]))
     print("everything is done")
 
@@ -95,7 +95,7 @@ def filterStopWords(data, stopWords):
     for i in range(NumberOfThreads):
         threads[i].join()
     stop = time.time()
-    print("stopWords:", stop - start)
+    print("CPU multithread stopWords:", stop - start)
     sortedResult = wordsFrequency(results.values())
     __getTwoItemsFromDict(sortedResult, "stop words")
     return sortedResult

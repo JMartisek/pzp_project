@@ -72,3 +72,11 @@ def createHashWord(data):
     for i in data:
         MyTextDictionary[murmur64(i)] = i
     return MyTextDictionary
+
+def hashArray(data):
+    output = []
+    lenght = []
+    for i in data:
+        lenght.append(len(i))
+        output.append(murmur64(i))
+    return output,lenght
