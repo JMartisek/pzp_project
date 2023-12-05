@@ -4,6 +4,7 @@ import murmurHash
 import CPU_multithread
 import time
 import GPU
+from Spark import SparkSize, SparkStopWords
 import threading
 import bogosort
 import psutil
@@ -46,7 +47,7 @@ print("CPU single thread takes", stop-start, "seconds")
 print("")
 print("------------------ CPU MULTI THREAD ------------------")
 
-testData2 = [2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8]
+testData2 = [2,5,4,7,5,6,7,3,5,7,4,65,8,4,6,3,2,5,4,7,5,6,7,2,5,7,4,65,3,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,3,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8]
 testData3 = [1, 2, 3]
 CPU_multithread.MFilterSize(parsedData)
 
@@ -71,8 +72,9 @@ print("part one have", len(part1), "items and part two have", len(part2), "items
 
 GPU.filterStopWords(hashed_parsedData, hashed_StopData) #test
 # spark version
-
-
+A = [4, 8, 2, 2, 4, 7, 0, 3, 3, 9, 2, 6, 0, 0, 1, 7, 5, 1, 9, 7]
+SparkSize(parsedData)
+SparkStopWords(parsedData,stopData)
 
 
 
