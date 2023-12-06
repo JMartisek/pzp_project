@@ -5,16 +5,28 @@ import CPU_multithread
 import time
 import GPU
 from Spark import SparkSize, SparkStopWords
-import threading
-import bogosort
-import psutil
 
+
+def statistic(filteredSizeData, filteredStopWordsData, sizeTime, stopTime):
+    print("-----------Filter by size-----------")
+    print("The most frequent words found there:")
+    print(filteredSizeData[0][0], "is there", filteredSizeData[0][1], "times.")
+    print(filteredSizeData[1][0], "is there", filteredSizeData[1][1], "times.")
+    print("Filter by size takes", sizeTime, "seconds.")
+    print("---------Filter by stopWords---------")
+    print("The most frequent words found there:")
+    print(filteredStopWordsData[0], "is there", filteredStopWordsData[0], "times.")
+    print(filteredStopWordsData[1], "is there", filteredStopWordsData[1], "times.")
+    print("Filter by size takes", stopTime, "seconds.")
+    print("-------------------------------------------")
+    print("Process takes", stopTime+sizeTime, "seconds.")
 
 #graphic functions
 def pieChart(labels, size):
     fig, ax = plt.subplots()
     ax.pie(size, labels=labels, autopct='%1.1f%%')
     plt.show()
+
 
 # data load
 data = open("data.txt", "r")
@@ -30,25 +42,26 @@ Hash_length_dict = murmurHash.createHashLenght(parsedData)
 Hash_word_dict = murmurHash.createHashWord(parsedData)
 hashed_data = murmurHash.hashedArray(parsedData)
 hash_stop_dict = murmurHash.createHashWord(stopData)
+testStopData = ['thee', 'electronic', 'barbarians', 'VERSION', 'summer-house']
+testInputData = ['thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house',]
+hashed_testStopData = murmurHash.hashedArray(testStopData)
 hashed_StopData = murmurHash.hashedArray(stopData)
-
+hashed_testInputData = murmurHash.hashedArray(testInputData)
 hashed_parsedData, parsedDataLenght = murmurHash.hashArray(parsedData)
+
+
 
 # cpu one thread version
 print("------------------ CPU ONE THREAD ------------------")
-start = time.time()
 cpuVersion1 = OneThreadCPU(False, parsedData, stopData)
-stop = time.time()
-
-print("CPU single thread takes", stop-start, "seconds")
+cpuSingleThreadData = cpuVersion1.gettAllData()
+statistic(cpuSingleThreadData[0],cpuSingleThreadData[2],cpuSingleThreadData[1], cpuSingleThreadData[3]  )
 
 # cpu multi thread version
 
 print("")
 print("------------------ CPU MULTI THREAD ------------------")
 
-testData2 = [2,5,4,7,5,6,7,3,5,7,4,65,8,4,6,3,2,5,4,7,5,6,7,2,5,7,4,65,3,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,3,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8,2,5,4,7,5,6,7,2,5,7,4,65,8,4,6,8]
-testData3 = [1, 2, 3]
 CPU_multithread.MFilterSize(parsedData)
 
 CPU_multithread.filterStopWords(parsedData, stopData,)
@@ -63,15 +76,14 @@ print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolor
 
 # gpu version
 print("------------------ GPU MULTI THREAD ------------------")
-GPU.filterSizeWords(hashed_parsedData,parsedDataLenght,Hash_word_dict, 4,8)
-
-# pokus o rozdeleni dat pro moznost spusteni stop_word filtru
-part1 = hashed_parsedData[0:len(hashed_data)//2]
-part2 = hashed_parsedData[len(hashed_data)//2:]
-print("part one have", len(part1), "items and part two have", len(part2), "items")
-
-GPU.filterStopWords(hashed_parsedData, hashed_StopData) #test
+[filteredSizeData, SizeInterval] = GPU.filterSizeWords(hashed_parsedData, parsedDataLenght, Hash_word_dict, 4, 8)
+[filteredStopData, StopInterval] = GPU.filterStopWords(hashed_testInputData, hashed_testStopData,Hash_word_dict)
+statistic(filteredSizeData, filteredStopData, SizeInterval,StopInterval)
+#print("Size:",filteredSizeData, SizeInterval )
+#print("Stop:",filteredStopData, StopInterval )
 # spark version
+
+print("------------------ SPARK ------------------")
 A = [4, 8, 2, 2, 4, 7, 0, 3, 3, 9, 2, 6, 0, 0, 1, 7, 5, 1, 9, 7]
 SparkSize(parsedData)
 SparkStopWords(parsedData,stopData)

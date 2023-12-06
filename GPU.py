@@ -17,7 +17,7 @@ def filterSizeWords(data_keys, data_values,hashDic, min_length, max_length):
 
     BLOCK_SIZE = 256
     GRID_SIZE = (sizeOfArray + BLOCK_SIZE - 1) // BLOCK_SIZE
-
+    start2 = time.time()
     # CUDA kernel
     kernel_code = """
     __global__ void search_words_kernel(const int64_t *hash_values, const uint8_t *word_lengths, int num_words, int min_length, int max_length, int64_t *results) {
@@ -36,7 +36,7 @@ def filterSizeWords(data_keys, data_values,hashDic, min_length, max_length):
     search_Stopwords = mod.get_function("search_words_kernel")
 
     # Převod dat na GPU
-    start2 = time.time()
+
     nData_gpu = cuda.to_device(nData)
     nDataLength_gpu = cuda.to_device(nDataLength)
     output_gpu = cuda.to_device(output)
@@ -49,23 +49,25 @@ def filterSizeWords(data_keys, data_values,hashDic, min_length, max_length):
     stop2 = time.time()
     # Výpis výsledků
     realOutput = []
-    print("GPU only process:", stop - start, "seconds \n GPU with data transfer between CPU and GPU:", stop2 - start2, "Seconds" )
-    print("Data loading takes:", (stop2-start2)-(stop-start), "seconds.")
+    #print("GPU only process:", stop - start, "seconds \n GPU with data transfer between CPU and GPU:", stop2 - start2, "Seconds" )
+    #print("Data loading takes:", (stop2-start2)-(stop-start), "seconds.")
     complete = []
     realOutput = [hashDic.get(hash_value) for hash_value in output]
     for i in realOutput:
         if i != None:
             complete.append(i)
-    print("Number of filtered words:", len(complete))
-    print(output[:sizeOfArray])
+    #print("Number of filtered words:", len(complete))
+    sortedComplete = __wordsFrequency(complete)
+    #print(output[:sizeOfArray])
+    return [__getTwoItemsFromDict(sortedComplete), stop2 - start2]
 
-def filterStopWords(data, stopWords):
-    large_array = np.array(data, dtype=np.uint64)
-    small_array = np.array(stopWords, dtype=np.uint64)
-
+def filterStopWords(data, stopWords,hashDic):
+    large_array = np.array(data, dtype=np.int64)
+    small_array = np.array(stopWords, dtype=np.int64)
+    max_value = max(small_array)
     # Vytvoření pole pro výsledky
     result_array = np.zeros_like(large_array, dtype=np.bool_)
-
+    start = time.time()
     # Převod na GPU
     large_array_gpu = cuda.to_device(large_array)
     small_array_gpu = cuda.to_device(small_array)
@@ -98,6 +100,35 @@ def filterStopWords(data, stopWords):
 
     # Převod zpět na CPU
     cuda.memcpy_dtoh(result_array, result_array_gpu)
+    realOutput = [hashDic.get(hash_value) for hash_value in data]
+    result = pickStopWords(result_array,realOutput)
 
+    stop = time.time()
+
+    sortedResult = __wordsFrequency(result)
     # Výpis výsledků
-    print(result_array)
+    #print(result_array)
+    return [__getTwoItemsFromDict(sortedResult),stop - start ]
+
+def pickStopWords(booleanArray, data):
+    output = []
+    for i in range(len(data)):
+        if booleanArray[i] == True:
+            output.append(data[i])
+    return output
+
+
+def __wordsFrequency(data):
+    frequencyDic = {}
+    for i in data:
+        if i in frequencyDic:
+            frequencyDic[i] = frequencyDic.get(i) +1
+        else:
+            frequencyDic[i] = 1
+    # bogosort.bogoPogoSort(list(frequencyDic.values()))
+    return sorted(frequencyDic.items(), key=lambda x: x[1], reverse=True)
+
+def __getTwoItemsFromDict(dict):
+    return [dict[0], dict[1]]
+
+
