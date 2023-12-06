@@ -65,7 +65,6 @@ def filterSizeWords(data_keys, data_values,hashDic, min_length, max_length):
 def filterStopWords(data, stopWords,hashDic):
     large_array = np.array(data, dtype=np.uint64)
     small_array = np.array(stopWords, dtype=np.uint64)
-    max_value = max(small_array)
     # Vytvoření pole pro výsledky
     result_array = np.zeros_like(large_array, dtype=np.bool_)
     start = time.time()
@@ -77,20 +76,14 @@ def filterStopWords(data, stopWords,hashDic):
     # Spuštění jádra
     BLOCK_SIZE = 256
     GRID_SIZE = (large_array.size + BLOCK_SIZE - 1) // BLOCK_SIZE
-    print(sys.byteorder)
-    for i in small_array:
-        print("stopWord:", i)
+
+
     kernel_code = """
     __global__ void search_and_update_kernel(const uint64_t *large_array, int large_size, const uint64_t *small_array, int small_size, bool *result_array) {
         int tid = blockIdx.x * blockDim.x + threadIdx.x;
-        if (tid == 1){
-            for(int i = 0; i < small_size; i++)
-            {
-                printf(" GPU stop word %d \\n", small_array[i]);
-            }
-        }
+
         if (tid < large_size) {
-            int current_value = large_array[tid];
+            uint64_t current_value = large_array[tid];
 
             for (int i = 0; i < small_size; ++i) {
                 if (current_value == small_array[i]) {

@@ -15,8 +15,8 @@ def statistic(filteredSizeData, filteredStopWordsData, sizeTime, stopTime):
     print("Filter by size takes", sizeTime, "seconds.")
     print("---------Filter by stopWords---------")
     print("The most frequent words found there:")
-    print(filteredStopWordsData[0], "is there", filteredStopWordsData[0], "times.")
-    print(filteredStopWordsData[1], "is there", filteredStopWordsData[1], "times.")
+    print(filteredStopWordsData[0][0], "is there", filteredStopWordsData[0][1], "times.")
+    print(filteredStopWordsData[1][0], "is there", filteredStopWordsData[1][1], "times.")
     print("Filter by size takes", stopTime, "seconds.")
     print("-------------------------------------------")
     print("Process takes", stopTime+sizeTime, "seconds.")
@@ -43,7 +43,7 @@ Hash_word_dict = murmurHash.createHashWord(parsedData)
 hashed_data = murmurHash.hashedArray(parsedData)
 hash_stop_dict = murmurHash.createHashWord(stopData)
 testStopData = ['thee', 'electronic', 'barbarians', 'VERSION', 'summer-house']
-testInputData = ['thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house','thee', 'electronic', 'barbarians', 'VERSION', 'summer-house',]
+testInputData = ['thee', 'electronic', 'barbarians', 'VERSION', 'summer-house']
 hashed_testStopData = murmurHash.hashedArray(testStopData)
 hashed_StopData = murmurHash.hashedArray(stopData)
 hashed_testInputData = murmurHash.hashedArray(testInputData)
@@ -77,7 +77,7 @@ print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolor
 # gpu version
 print("------------------ GPU MULTI THREAD ------------------")
 [filteredSizeData, SizeInterval] = GPU.filterSizeWords(hashed_parsedData, parsedDataLenght, Hash_word_dict, 4, 8)
-[filteredStopData, StopInterval] = GPU.filterStopWords(hashed_testInputData, hashed_testStopData,Hash_word_dict)
+[filteredStopData, StopInterval] = GPU.filterStopWords(hashed_parsedData, hashed_StopData,Hash_word_dict)
 statistic(filteredSizeData, filteredStopData, SizeInterval,StopInterval)
 #print("Size:",filteredSizeData, SizeInterval )
 #print("Stop:",filteredStopData, StopInterval )
