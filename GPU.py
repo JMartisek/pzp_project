@@ -1,3 +1,4 @@
+import sys
 import time
 
 import numpy as np
@@ -62,8 +63,8 @@ def filterSizeWords(data_keys, data_values,hashDic, min_length, max_length):
     return [__getTwoItemsFromDict(sortedComplete), stop2 - start2]
 
 def filterStopWords(data, stopWords,hashDic):
-    large_array = np.array(data, dtype=np.int64)
-    small_array = np.array(stopWords, dtype=np.int64)
+    large_array = np.array(data, dtype=np.uint64)
+    small_array = np.array(stopWords, dtype=np.uint64)
     max_value = max(small_array)
     # Vytvoření pole pro výsledky
     result_array = np.zeros_like(large_array, dtype=np.bool_)
@@ -76,13 +77,20 @@ def filterStopWords(data, stopWords,hashDic):
     # Spuštění jádra
     BLOCK_SIZE = 256
     GRID_SIZE = (large_array.size + BLOCK_SIZE - 1) // BLOCK_SIZE
+    print(sys.byteorder)
+    for i in small_array:
+        print("stopWord:", i)
     kernel_code = """
-    __global__ void search_and_update_kernel(const int *large_array, int large_size, const int *small_array, int small_size, bool *result_array) {
+    __global__ void search_and_update_kernel(const uint64_t *large_array, int large_size, const uint64_t *small_array, int small_size, bool *result_array) {
         int tid = blockIdx.x * blockDim.x + threadIdx.x;
-
+        if (tid == 1){
+            for(int i = 0; i < small_size; i++)
+            {
+                printf(" GPU stop word %d \\n", small_array[i]);
+            }
+        }
         if (tid < large_size) {
             int current_value = large_array[tid];
-
 
             for (int i = 0; i < small_size; ++i) {
                 if (current_value == small_array[i]) {
@@ -95,7 +103,7 @@ def filterStopWords(data, stopWords,hashDic):
     """
     mod = SourceModule(kernel_code)
     search_and_update_kernel = mod.get_function("search_and_update_kernel")
-    search_and_update_kernel(large_array_gpu, np.int32(large_array.size), small_array_gpu, np.int32(small_array.size),
+    search_and_update_kernel(large_array_gpu, np.uint64(large_array.size), small_array_gpu, np.uint64(small_array.size),
                              result_array_gpu, block=(BLOCK_SIZE, 1, 1), grid=(GRID_SIZE, 1, 1))
 
     # Převod zpět na CPU
