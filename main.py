@@ -62,17 +62,17 @@ statistic(cpuSingleThreadData[0],cpuSingleThreadData[2],cpuSingleThreadData[1], 
 print("")
 print("------------------ CPU MULTI THREAD ------------------")
 
-CPU_multithread.MFilterSize(parsedData)
+[CPUSizeWords, CPU_size_interval] =CPU_multithread.MFilterSize(parsedData)
 
-CPU_multithread.filterStopWords(parsedData, stopData,)
-
+[CPUStopWords, CPU_stop_interval] = CPU_multithread.filterStopWords(parsedData, stopData,)
+statistic(CPUSizeWords,CPUStopWords,CPU_size_interval,CPU_stop_interval)
 class bcolors:
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
     ENDC = '\033[0m'
 
-print( bcolors.OKGREEN +"Warning: No active frommets remain. Continue?" + bcolors.ENDC)
+print( bcolors.OKGREEN +"Warning: GDE BODY?" + bcolors.ENDC)
 
 # gpu version
 print("------------------ GPU MULTI THREAD ------------------")
