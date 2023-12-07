@@ -16,30 +16,22 @@ class OneThreadCPU:
 
     __privateVariable = 0
 
-    def __init__(self, hashed, data, stopWords):
+    def __init__(self, data, stopWords):
         self.data = data
         self.stopWords = stopWords
-        if not hashed:
-            OneThreadCPU.__filterSizeWord(self)
-            self.countSizeWordDict = OneThreadCPU.__wordsFrequency(self, self.middleValue)
-            #tst = self.countSizeWordDict[0]
-            #tst2 = tst[0]
-            #tst3 = self.countSizeWordDict[0][0]
-            OneThreadCPU.__getTwoItemsFromDict(self,self.countSizeWordDict, "filter size")
-            OneThreadCPU.__stopWordsFilter(self)
-            self.countStopWordDict = OneThreadCPU.__wordsFrequency(self, self.indexStopWordsDict.values())
-            OneThreadCPU.__getTwoItemsFromDict(self,self.countStopWordDict, "stop word")
-
-
-        else:
-            print("Not ready yet..")
-        # vsechny vystupy jako instance classy, tedy: 3 pole a v kazdem rozdeleni do delky slov
+        OneThreadCPU.__filterSizeWord(self)
+        self.countSizeWordDict = OneThreadCPU.__wordsFrequency( self.middleValue)
+        OneThreadCPU.__getTwoItemsFromDict(self,self.countSizeWordDict, "filter size")
+        OneThreadCPU.__stopWordsFilter(self)
+        self.countStopWordDict = OneThreadCPU.__wordsFrequency( self.indexStopWordsDict.values())
+        OneThreadCPU.__getTwoItemsFromDict(self,self.countStopWordDict, "stop word")
 
     def gettAllData(self):
         SizeArray = []
         for i in self.countSizeWordDict:
             SizeArray.append(i[0])
-        return [self.SizeTwo,self.sizeTime, self.StopWordTwo,self.stopTime ]
+        return [self.SizeTwo,self.sizeTime, self.StopWordTwo,self.stopTime]
+
     @staticmethod
     def parseWords(array):
         return OneThreadCPU.__cleanWords(array.split())
@@ -51,31 +43,29 @@ class OneThreadCPU:
         return True
 
     @staticmethod
-    def __weirdStringParser(list, word, index):
+    def __weirdStringParser(output, word, index):
         partioned = word.partition("--")
-        list[index] = partioned[0]
-        list.insert(index+1,partioned[2])
-        return list
+        output[index] = partioned[0]
+        output.insert(index+1,partioned[2])
+        return output
 
     @staticmethod
     def __cleanWords(array):
         repeat = True
-        susWords = []
         lastWordList = [",", ")", ".", "\"", "-", ":", ";", "!", "?"]
-        firstWordList = ["\"", "-", "("]
+        firstWordList = ["\"", "-", "(", "ï", "»", "¿"]
         for index, a in enumerate(array):
             repeat = True
 
-            while (repeat == True):
+            while repeat == True:
                 repeat = False
                 if OneThreadCPU.__checkLen(a) > 0:
-                    if a[
-                        len(a) - 1] in lastWordList:  # == "," or a[0] == ")" or a[len(a) - 1] == "." or a[len(a) - 1] == "\"" or a[len(a) - 1] == "-" or a[len(a) - 1] == ":" or a[len(a) - 1] == ";" or a[len(a) - 1] == "!"or a[len(a) - 1] == "?":
+                    if a[len(a) - 1] in lastWordList:
                         a = a[0:len(a) - 1]
                         array[index] = a
                         repeat = OneThreadCPU.__checkLen(a)
 
-                    elif a[0] in firstWordList:  # == "\"" or a[0] == "-" or a[0] == "(":
+                    elif a[0] in firstWordList:
                         a = a[1:]
                         array[index] = a
                         repeat = OneThreadCPU.__checkLen(a)
@@ -95,8 +85,6 @@ class OneThreadCPU:
                 OneThreadCPU.middleValue.append(word)
         stop = time.time()
         self.sizeTime = stop - start
-        #print("CPU single thread filter size takes", stop - start, "seconds")
-        #print("Number of elements after filter size: ",len(self.middleValue))
 
     @staticmethod
     def __stopWordsFilter(self):
@@ -106,27 +94,22 @@ class OneThreadCPU:
                 self.indexStopWordsDict[index] = word
         stop = time.time()
         self.stopTime = stop - start
-        #print("CPU single thread stopWords filter takes", stop - start, "seconds")
-        #print("Number of elements after stop word filtration: ", len(self.indexStopWordsDict.values()))
 
     @staticmethod
-    def __wordsFrequency(self, data):
+    def __wordsFrequency(data):
         frequencyDic = {}
         for i in data:
             if i in frequencyDic:
-                frequencyDic[i] = frequencyDic.get(i) +1
+                frequencyDic[i] = frequencyDic.get(i) + 1
             else:
                 frequencyDic[i] = 1
-        # bogosort.bogoPogoSort(list(frequencyDic.values()))
         return sorted(frequencyDic.items(), key=lambda x: x[1], reverse=True)
 
     def __getTwoItemsFromDict(self, dict, type):
-        if(type == "filter size"):
+        if type == "filter size":
             self.SizeTwo = [dict[0], dict[1]]
         else:
             self.StopWordTwo = [dict[0], dict[1]]
-        #print("First",type," value", dict[0],  "and second", dict[1])
-
 
     @staticmethod
     def __getValueByKey(self, data, key):

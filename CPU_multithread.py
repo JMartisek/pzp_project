@@ -3,19 +3,13 @@ import math
 import time
 import bogosort
 from GPU import __getTwoItemsFromDict
-from pycuda import driver, compiler, gpuarray, tools
-# mam prej 16 threadu
+
 NumberOfThreads = 16
 
 
-
 def threadParameters(Data):
-
     return  math.floor(len(Data) / NumberOfThreads)
 
-
-def stopWordsCounter(Data):
-    threadParameters(Data)
 
 def MFilterSize(data):
     NumberOfItemOnOneThread = threadParameters(data)
@@ -25,7 +19,7 @@ def MFilterSize(data):
     middle = []
     higher = []
     result = [lower, middle, higher]
-    results = [[],[],[]]
+    results = [[], [], []]
     lck = threading.Lock()
 
     for i in range(NumberOfThreads):
@@ -74,6 +68,7 @@ def FilterSize(dataSet, results, i,lck):
     results[2].append(greater)
     lck.release()
 
+
 def filterStopWords(data, stopWords):
     NumberOfItemOnOneThread = threadParameters(data)
     threads = []
@@ -95,13 +90,15 @@ def filterStopWords(data, stopWords):
 
     return [__getTwoItemsFromDict(sortedResult), stop - start]
 
+
 def filterStopWord(data, stopWords, results, AdIndex,lck):
     for index, word in enumerate(data):
         if word in stopWords:
-            actualIndex =index+ AdIndex
+            actualIndex = index + AdIndex
             lck.acquire()
             results[actualIndex] = word
             lck.release()
+
 
 def wordsFrequency(data):
     frequencyDic = {}
@@ -110,8 +107,4 @@ def wordsFrequency(data):
             frequencyDic[i] = frequencyDic.get(i) +1
         else:
             frequencyDic[i] = 1
-    # bogosort.bogoPogoSort(list(frequencyDic.values()))
     return sorted(frequencyDic.items(), key=lambda x: x[1], reverse=True)
-
-#def __getTwoItemsFromDict(dict, type):
-#    print("First",type," value", dict[0],  "and second", dict[1])
