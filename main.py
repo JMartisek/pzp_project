@@ -85,8 +85,9 @@ statistic(filteredSizeData, filteredStopData, SizeInterval,StopInterval)
 
 print("------------------ SPARK ------------------")
 A = [4, 8, 2, 2, 4, 7, 0, 3, 3, 9, 2, 6, 0, 0, 1, 7, 5, 1, 9, 7]
-SparkSize(parsedData)
-SparkStopWords(parsedData,stopData)
+[filteredSparkSizeData, SparkSizeInterval] = SparkSize(parsedData)
+[filteredSparkStopData, SparkStopInterval] =SparkStopWords(parsedData,stopData)
+statistic(filteredSparkSizeData,filteredSparkStopData,SparkSizeInterval,SparkStopInterval)
 
 
 
