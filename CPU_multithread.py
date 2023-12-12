@@ -14,7 +14,6 @@ def threadParameters(Data):
 def MFilterSize(data):
     NumberOfItemOnOneThread = threadParameters(data)
     threads = []
-    iterator = 0
     lower = []
     middle = []
     higher = []
@@ -26,7 +25,6 @@ def MFilterSize(data):
         Dataset = data[i*NumberOfItemOnOneThread:(1+i)*NumberOfItemOnOneThread]
         t = threading.Thread(target=FilterSize, args=(Dataset, results, i, lck))
         threads.append(t)
-        iterator += 1
 
     start = time.time()
     for i in range(NumberOfThreads):
@@ -34,7 +32,6 @@ def MFilterSize(data):
 
     for i in range(NumberOfThreads):
         threads[i].join()
-    size = len(results)
     for i in range(len(results)):
         for j in results[i]:
             result[i] += j

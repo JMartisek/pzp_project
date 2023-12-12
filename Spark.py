@@ -7,9 +7,7 @@ from GPU import __wordsFrequency, __getTwoItemsFromDict
 
 # 12 cores
 def SparkSize(data):
-    spark = SparkSession.builder.appName("example") \
-        .config("spark.cores.max", "12") \
-        .getOrCreate()
+    spark = SparkSession.builder.appName("example").config("spark.cores.max", "12").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     df = spark.createDataFrame([(word,) for word in data], ["word"])
     start = time.time()
@@ -21,9 +19,7 @@ def SparkSize(data):
 
 
 def SparkStopWords(data, stopWords):
-    spark = SparkSession.builder.appName("example") \
-        .config("spark.cores.max", "12") \
-        .getOrCreate()
+    spark = SparkSession.builder.appName("example").config("spark.cores.max", "12").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     df = spark.createDataFrame([(idx, value) for idx, value in enumerate(data)], ["index", "value"])
     start = time.time()
