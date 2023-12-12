@@ -23,7 +23,6 @@ def statistic(SizeData, StopWordsData, sizeTime, stopTime):
 
 # graphic function
 def pieChart(labels, size, title, index):
-    #plt.figure(index)
     fig, axs = plt.subplots(1,2+index)
     for i in range(2+index):
         axs[i].pie(size[i], labels=labels, autopct='%1.1f%%')

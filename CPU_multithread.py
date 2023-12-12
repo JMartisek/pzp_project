@@ -24,7 +24,7 @@ def MFilterSize(data):
 
     for i in range(NumberOfThreads):
         Dataset = data[i*NumberOfItemOnOneThread:(1+i)*NumberOfItemOnOneThread]
-        t = threading.Thread(target=FilterSize, args=(Dataset,results,i,lck))
+        t = threading.Thread(target=FilterSize, args=(Dataset, results, i, lck))
         threads.append(t)
         iterator += 1
 

@@ -29,6 +29,7 @@ def filterSizeWords(inputData, dataLenght, hashDic, min_length, max_length):
                 results[tid] = hash_values[tid];
             }
         }
+        __syncthreads();
     }
     """
 
@@ -80,16 +81,17 @@ def filterStopWords(data, stopWords,hashDic):
                 }
             }
         }
+        __syncthreads();
     }
     """
     mod = SourceModule(kernel_code)
     search_and_update_kernel = mod.get_function("search_and_update_kernel")
 
-    large_array_gpu = cuda.to_device(nData)
-    small_array_gpu = cuda.to_device(nStopWords)
+    nData_gpu = cuda.to_device(nData)
+    nStopWords_gpu = cuda.to_device(nStopWords)
     result_array_gpu = cuda.to_device(result_array)
 
-    search_and_update_kernel(large_array_gpu, np.uint64(nData.size), small_array_gpu, np.uint64(nStopWords.size),
+    search_and_update_kernel(nData_gpu, np.uint64(nData.size), nStopWords_gpu, np.uint64(nStopWords.size),
                              result_array_gpu, block=(BLOCK_SIZE, 1, 1), grid=(GRID_SIZE, 1, 1))
 
     cuda.memcpy_dtoh(result_array, result_array_gpu)
