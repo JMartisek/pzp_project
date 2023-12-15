@@ -20,7 +20,7 @@ def filterSizeWords(inputData, dataLenght, hashDic, min_length, max_length):
 
 
     kernel_code = """
-    __global__ void filterStopWords(const int64_t *hash_values, const uint8_t *word_lengths, int num_words, int min_length, int max_length, int64_t *results) {
+    __global__ void filterSizeWords(const int64_t *hash_values, const uint8_t *word_lengths, int num_words, int min_length, int max_length, int64_t *results) {
         int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
         if (tid < num_words) {
@@ -35,14 +35,17 @@ def filterSizeWords(inputData, dataLenght, hashDic, min_length, max_length):
 
     start = time.time()
     mod = SourceModule(kernel_code)
-    search_Stopwords = mod.get_function("filterStopWords")
-
+    filterSizeWords = mod.get_function("filterSizeWords")
+    timerLoadData = time.time()
     nData_gpu = cuda.to_device(nData)
     nDataLength_gpu = cuda.to_device(nDataLength)
     output_gpu = cuda.to_device(output)
-    search_Stopwords(nData_gpu, nDataLength_gpu, np.int32(sizeOfArray), np.int32(min_length), np.int32(max_length), output_gpu, block=(BLOCK_SIZE, 1, 1), grid=(GRID_SIZE, 1, 1))
-
+    timerLoadedData = time.time()
+    filterSizeWords(nData_gpu, nDataLength_gpu, np.int32(sizeOfArray), np.int32(min_length), np.int32(max_length), output_gpu, block=(BLOCK_SIZE, 1, 1), grid=(GRID_SIZE, 1, 1))
+    timerGetData = time.time()
     cuda.memcpy_dtoh(output, output_gpu)
+    timerGotData = time.time()
+    print("GPU filter size transfer data takes", (timerLoadedData-timerLoadData)+(timerGotData - timerGetData))
     complete = []
     realOutput = [hashDic.get(hash_value) for hash_value in output]
     for i in realOutput:
@@ -65,7 +68,7 @@ def filterStopWords(data, stopWords,hashDic):
 
 
     kernel_code = """
-    __global__ void search_and_update_kernel(const uint64_t *nData, int dataLenght, const uint64_t *nStopWords, int numberOfStopWords, bool *result_array) {
+    __global__ void filterStopWords(const uint64_t *nData, int dataLenght, const uint64_t *nStopWords, int numberOfStopWords, bool *result_array) {
         int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
         if (tid < dataLenght) {
@@ -84,15 +87,18 @@ def filterStopWords(data, stopWords,hashDic):
 
     start = time.time()
     mod = SourceModule(kernel_code)
-    search_and_update_kernel = mod.get_function("search_and_update_kernel")
-
+    filterStopWords = mod.get_function("filterStopWords")
+    timerLoadData = time.time()
     nData_gpu = cuda.to_device(nData)
     nStopWords_gpu = cuda.to_device(nStopWords)
     result_array_gpu = cuda.to_device(result_array)
-    search_and_update_kernel(nData_gpu, np.uint64(nData.size), nStopWords_gpu, np.uint64(nStopWords.size),
+    timerLoadedData = time.time()
+    filterStopWords(nData_gpu, np.uint64(nData.size), nStopWords_gpu, np.uint64(nStopWords.size),
                              result_array_gpu, block=(BLOCK_SIZE, 1, 1), grid=(GRID_SIZE, 1, 1))
-
+    timerGetData = time.time()
     cuda.memcpy_dtoh(result_array, result_array_gpu)
+    timerGotData = time.time()
+    print("GPU stop words transfer data takes", (timerLoadedData - timerLoadData) + (timerGotData - timerGetData))
     realOutput = [hashDic.get(hash_value) for hash_value in data]
     result = pickStopWords(result_array,realOutput)
 

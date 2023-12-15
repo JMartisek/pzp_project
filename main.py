@@ -32,7 +32,16 @@ def pieChart(labels, size, title, index):
     else:
         plt.show()
 
-
+def graph(data):
+    categories = []
+    values = []
+    for i in data:
+        categories.append(i[0])
+        values.append(i[1])
+    plt.bar(categories, values)
+    plt.xlabel('word')
+    plt.ylabel('count')
+    plt.show()
 
 # data load
 data = open("data.txt", "r")
@@ -56,7 +65,7 @@ print("-------------------- CPU ONE THREAD --------------------")
 cpuVersion1 = OneThreadCPU(parsedData, stopData)
 cpuSingleThreadData = cpuVersion1.gettAllData()
 statistic(cpuSingleThreadData[0], cpuSingleThreadData[2], cpuSingleThreadData[1], cpuSingleThreadData[3])
-
+graph(cpuSingleThreadData[0])
 
 print("")
 print("------------------- CPU MULTI THREAD -------------------")

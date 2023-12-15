@@ -107,9 +107,9 @@ class OneThreadCPU:
 
     def __getTwoItemsFromDict(self, dict, type):
         if type == "filter size":
-            self.SizeTwo = [dict[0], dict[1]]
+            self.SizeTwo = [dict[0], dict[1], dict[2], dict[3], dict[4]]
         else:
-            self.StopWordTwo = [dict[0], dict[1]]
+            self.StopWordTwo = [dict[0], dict[1], dict[2], dict[3], dict[4]]
 
     @staticmethod
     def __getValueByKey(self, data, key):
